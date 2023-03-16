@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class BtnBlue extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   const BtnBlue({
     super.key,

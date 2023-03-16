@@ -1,9 +1,15 @@
+// Librarys
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+// Widgets
 import 'package:chat_app/widgets/btn_blue.dart';
 import 'package:chat_app/widgets/custom_input.dart';
 import 'package:chat_app/widgets/labels.dart';
 import 'package:chat_app/widgets/logo.dart';
+// Services
+import 'package:chat_app/services/auth_service.dart';
+// Helpers
+import 'package:chat_app/helpers/mostrar_alerta.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -51,6 +57,8 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -70,10 +78,25 @@ class __FormState extends State<_Form> {
           ),
           BtnBlue(
             text: 'Ingrese',
-            onPressed: () {
-              // print(emailCtrl.text);
-              // print(passCtrl.text);
-            },
+            onPressed: authService.autenticando
+                ? null
+                : () async {
+                    // print(emailCtrl.text);
+                    // print(passCtrl.text);
+                    FocusScope.of(context).unfocus();
+                    final loginOk = authService.login(
+                        emailCtrl.text.trim(), passCtrl.text.trim());
+
+                    if (await loginOk) {
+                      // TODO: Conectar a nuestro socket server
+                      // Navegar a otra pantalla
+                      Navigator.pushReplacementNamed(context, 'users');
+                    } else {
+                      // Mostrar alerta
+                      mostrarAlerta(context, 'Login incorrecto',
+                          'Revise sus credenciales nuevamente');
+                    }
+                  },
           ),
         ],
       ),

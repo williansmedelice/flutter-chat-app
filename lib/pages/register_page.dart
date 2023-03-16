@@ -1,9 +1,15 @@
+// Librarys
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+// Services
+import 'package:chat_app/services/auth_service.dart';
+// Widgets
 import 'package:chat_app/widgets/btn_blue.dart';
 import 'package:chat_app/widgets/custom_input.dart';
 import 'package:chat_app/widgets/labels.dart';
 import 'package:chat_app/widgets/logo.dart';
+// Helpers
+import 'package:chat_app/helpers/mostrar_alerta.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -52,6 +58,7 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -75,11 +82,29 @@ class __FormState extends State<_Form> {
             isPassword: true,
           ),
           BtnBlue(
-            text: 'Ingrese',
-            onPressed: () {
-              // print(emailCtrl.text);
-              // print(passCtrl.text);
-            },
+            text: 'Crear cuenta',
+            onPressed: authService.autenticando
+                ? null
+                : () async {
+                    // print(emailCtrl.text);
+                    // print(passCtrl.text);
+                    // print(nameCtrl.text);
+                    FocusScope.of(context).unfocus();
+                    final registerOk = authService.register(
+                        nameCtrl.text.trim(),
+                        emailCtrl.text.trim(),
+                        passCtrl.text.trim());
+
+                    if (await registerOk == true) {
+                      // TODO: Conectar a nuestro socket server
+                      // Navegar a otra pantalla
+                      Navigator.pushReplacementNamed(context, 'users');
+                    } else {
+                      // Mostrar alerta
+                      mostrarAlerta(
+                          context, 'Registro incorrecto', await registerOk);
+                    }
+                  },
           ),
         ],
       ),
